@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
+import { connectToDB } from "./utils/mongooseCruds";
 
 
 // Use dotenv package to use envirenment variable
@@ -11,6 +12,10 @@ const PORT = process.env.PORT || 4000;// Get PRT from .env file
 
 // Express built-in middleware for parsing JSON
 app.use(express.json());
+
+// Database URL
+const databaseURL:string = `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`;
+connectToDB(databaseURL);// Connect to "SpaiderEstate" Database
 
 
 // Start listening
