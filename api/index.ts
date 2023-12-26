@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import { connectToDB } from "./utils/mongooseCruds";
+import { errorHandler, notFound } from "./middlewares/errorHandling";
 
 
 // Use dotenv package to use envirenment variable
@@ -17,6 +18,9 @@ app.use(express.json());
 const databaseURL:string = `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`;
 connectToDB(databaseURL);// Connect to "SpaiderEstate" Database
 
+// Error Middleware
+app.use(notFound);
+app.use(errorHandler);
 
 // Start listening
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
