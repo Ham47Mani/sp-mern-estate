@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch \"api/**/*.ts\" --exec \"ts-node\" api/index.ts"
+    "start": "nodemon --watch \"api/**/*.ts\" --exec \"ts-node\" api/index.ts",
+    "dev": "ts-node api/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "@types/node": "^20.10.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
