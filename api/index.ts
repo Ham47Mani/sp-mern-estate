@@ -4,6 +4,7 @@ import { connectToDB } from "./utils/mongooseCruds";
 import { errorHandler, notFound } from "./middlewares/errorHandling";
 import userRouter from "./routes/user.toute";
 import authRouter from "./routes/auth.route";
+import cors, { CorsOptions } from "cors";
 
 
 // Use dotenv package to use envirenment variable
@@ -15,6 +16,13 @@ const PORT = process.env.PORT || 4000;// Get PRT from .env file
 
 // Express built-in middleware for parsing JSON
 app.use(express.json());
+
+const corsOptions: CorsOptions = {
+  origin: 'http://localhost:3000', // Allow only requests from this origin
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+// Enable CORS for a specific origin
+app.use(cors(corsOptions));
 
 // Database URL
 const databaseURL:string = `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`;

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { HttpStatusCode } from "../utils/httpStatusCodes";
 import userModel from "../models/user.model";
@@ -7,12 +7,12 @@ import { handleResponseError, handleResponseSuccess } from "../utils/handleRespo
 
 
 // ======================= Signup User =======================
-export const signup = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const signup = asyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { username, email, password } = req.body;
   // Check if all inputs empty
   if (!username || !email || !password) {
-    res.status(HttpStatusCode.BADREQUEST);
-    throw new Error('All fields (username, email, password) are required');
+    handleResponseError(res, HttpStatusCode.BADREQUEST, 'All fields (username, email, password) are required');
+    return;
   }
   try {
     // Check if user exists
