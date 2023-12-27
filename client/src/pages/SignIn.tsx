@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Dispatch } from "@reduxjs/toolkit";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
+import { useSelector } from "react-redux";
 
 // Interface of user inputs data
 interface FORMDATA {
@@ -10,9 +15,11 @@ interface FORMDATA {
 
 const SignIn = () => {
   const [formInputs, setFormInputs] = useState<FORMDATA>({email: "", password: ""});
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  // Navigate to forward
   const navigate:NavigateFunction = useNavigate();
+  // Use redux
+  const dispatch:Dispatch = useDispatch();
+  const {error, loading} = useSelector((state: any) => state.user)
 
   //- Handle change input value
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -25,8 +32,7 @@ const SignIn = () => {
   // Handle submit
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);// Change loading to true
-    setError(null);
+    dispatch(signInStart());
     try {
       // Send a request
       const res = await fetch("/api/auth/sigin", {
@@ -38,15 +44,13 @@ const SignIn = () => {
       });
       const data = await res.json();
       if(data.success === false) {
-        setError(data.message);
-        setLoading(false);
+        dispatch(signInFailure(data.message));
         return;
       }
+      dispatch(signInSuccess(data.data));
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(err.message));
     }
   }
   return (
