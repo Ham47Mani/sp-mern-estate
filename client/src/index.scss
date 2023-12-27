@@ -4,5 +4,12 @@
 @tailwind utilities;
 // ======================== End Add TailwindCss ========================
 
-// ======================== Start  ========================
-// ======================== End  ========================
+// Import Robik Font
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
+
+// ======================== Start Global Rules ========================
+body {
+  font-family: 'Rubik', sans-serif;
+  background-color: rgb(241, 245, 241);
+}
+// ======================== End Global Rules ========================
