@@ -10,8 +10,9 @@ export const notFound = (req: Request, res: Response, next: NextFunction) : void
 };
 
 // ---------------- Error handler ----------------
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) : void => {
+export const errorHandler = (err: Error, req: Request, res: Response) : void => {
   const statusCode: number = res.statusCode === 200 ? 500 : res.statusCode;
-  handleResponseError(res, statusCode, err?.message);
-  next();
+  const errorMessage: string = err.message || "Internal Server Error";
+  handleResponseError(res, statusCode, errorMessage);
+  return;
 };

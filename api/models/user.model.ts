@@ -1,7 +1,6 @@
 import { CallbackWithoutResultAndOptionalError, Schema, model } from "mongoose";
 import { USER } from "../utils/modale.type";
 import { hashPassword, isMatchedPassword } from "../utils/bcrypt.util";
-import { createHash, randomBytes } from "crypto";
 
 // Create user schema
 const userSchema: Schema<USER> = new Schema(

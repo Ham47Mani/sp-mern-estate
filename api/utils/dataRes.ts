@@ -6,4 +6,4 @@ interface RESDATA {
 
 export const resData = (message: string, success: boolean, data?: any[]) : RESDATA => {
   return {message, data, success};
-}
+};
