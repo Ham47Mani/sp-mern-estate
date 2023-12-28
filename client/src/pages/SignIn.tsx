@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dispatch } from "@reduxjs/toolkit";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
-import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
+import { resetError, signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 import { useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
 
@@ -20,8 +20,12 @@ const SignIn = () => {
   const navigate:NavigateFunction = useNavigate();
   // Use redux
   const dispatch:Dispatch = useDispatch();
-  const {error, loading} = useSelector((state: any) => state.user)
-
+  const {error, loading} = useSelector((state: any) => state.user.user);
+  
+  useEffect(() => {
+    dispatch(resetError());// Reset Error when reload page
+  }, [dispatch]);
+  
   //- Handle change input value
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;

@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { Link, NavigateFunction, useNavigate } from "react-router-dom"
 import OAuth from "../components/OAuth";
+import { Dispatch } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+import { resetError, signInFailure, signInStart } from "../redux/user/userSlice";
 
 // Interface of user inputs data
 interface FORMDATA {
@@ -13,9 +16,14 @@ interface FORMDATA {
 
 const SignUp = () => {
   const [formInputs, setFormInputs] = useState<FORMDATA>({username: "", email: "", password: ""});
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const navigate:NavigateFunction = useNavigate();
+  // Use redux
+  const dispatch:Dispatch = useDispatch();
+  const {error, loading} = useSelector((state: any) => state.user.user);
+  
+  useEffect(() => {
+    dispatch(resetError());// Reset Error when reload page
+  }, [dispatch]);
 
   //- Handle change input value
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -28,8 +36,7 @@ const SignUp = () => {
   // Handle submit
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);// Change loading to true
-    setError(null);
+    dispatch(signInStart());
     try {
       // Send a request
       const res = await fetch("/api/auth/sigup", {
@@ -41,15 +48,12 @@ const SignUp = () => {
       });
       const data = await res.json();
       if(data.success === false) {
-        setError(data.message);
-        setLoading(false);
+        dispatch(signInFailure(data.message));
         return;
       }
       navigate('/sign-in');
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(err.message));
     }
   }
   return (
