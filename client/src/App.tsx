@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Layout from "./components/Layout";
 import PrivetRoute from "./components/PrivetRoute";
+import RedirectToPRofile from "./components/RedirectToPRofile";
 
 const App = () => {
   return (
@@ -15,11 +16,15 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Layout/>}>
           <Route path="" index element={<Home />}/>
-          <Route path="sign-in" element={<SignIn />} />
-          <Route path="sign-up" element={<SignUp />} />
           <Route path="about" element={<About />} />
+          {/* --- Protect the profile page --- */}
           <Route element={<PrivetRoute />} >
             <Route path="profile" element={<Profile />} />
+          </Route>
+          {/* --- Not allow user authenticate to go to SignIn|SignOut page --- */}
+          <Route element={<RedirectToPRofile />} >
+            <Route path="sign-in" element={<SignIn />} />
+            <Route path="sign-up" element={<SignUp />} />
           </Route>
         </Route>
       </Routes>
