@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FormEvent, useState } from "react"
 import { Link, NavigateFunction, useNavigate } from "react-router-dom"
+import OAuth from "../components/OAuth";
 
 // Interface of user inputs data
 interface FORMDATA {
@@ -63,6 +64,7 @@ const SignUp = () => {
         <button type="submit" disabled={loading} className="bg-slate-700 p-3 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
           {loading ? "loading..." : "Sign Up"}
         </button>
+        <OAuth />
       </form>
       {/* ------ Link to sign in ------ */}
       <div className="flex gap-2 mt-5">

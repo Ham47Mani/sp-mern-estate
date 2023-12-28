@@ -65,3 +65,36 @@ export const signin = asyncHandler(async (req: Request, res: Response): Promise<
     return;
   }
 });
+
+// ======================= Sign In with google User =======================
+export const signInWithGoogle = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { username, email, photo } = req.body;
+  // Check if all inputs empty
+  if (!username || !email) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, 'All fields (username, email, password) are required');
+    return;
+  }
+  try {
+    // Check if user exists
+    const existingUser: any = await getItem(userModel, { email });
+    if (existingUser) {
+      // Create JWT token
+      const token: string | JwtPayload = await generateToken(existingUser._id)
+      // Send cookie with name "access_token" and value is jwt token
+      res.cookie('access_token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+      const {password: pass, ...rest} = existingUser._doc;
+      res.cookie('access_token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+      handleResponseSuccess(res, HttpStatusCode.OK, `User ${existingUser.username} login`, [rest]);
+      return;
+    }
+    // Create new user
+    const generatePassword: string = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    const generateUsername: string = username.split(" ").join("").toLowerCase() + Math.floor(Math.random() * 10000);
+    const newUser: any = await createItem(userModel, {username: generateUsername, email, photo, password: generatePassword});
+    const {password: pass, ...rest} = newUser._doc;
+    handleResponseSuccess(res, HttpStatusCode.CREATED, 'User created successfully', [rest]);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, err.message);
+    return;
+  }
+});

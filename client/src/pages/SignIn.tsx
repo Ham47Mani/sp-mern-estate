@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 import { useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 
 // Interface of user inputs data
 interface FORMDATA {
@@ -64,6 +65,7 @@ const SignIn = () => {
         <button type="submit" disabled={loading} className="bg-slate-700 p-3 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
           {loading ? "loading..." : "Sign In"}
         </button>
+        <OAuth />
       </form>
       {/* ------ Link to sign in ------ */}
       <div className="flex gap-2 mt-5">

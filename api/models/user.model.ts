@@ -18,6 +18,10 @@ const userSchema: Schema<USER> = new Schema(
     password: {
       type: String,
       required: true,
+    },
+    photo: {
+      type: String,
+      default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhOaaBAY_yOcJXbL4jW0I_Y5sePbzagqN2aA&usqp=CAU"
     }
   }, {
     timestamps: true// Add timestamps option to automatically generate createdAt and updatedAt fields
