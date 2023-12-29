@@ -2,9 +2,10 @@ import express, { Express } from "express";
 import dotenv from "dotenv";
 import { connectToDB } from "./utils/mongooseCruds";
 import { errorHandler, notFound } from "./middlewares/errorHandling";
-import userRouter from "./routes/user.toute";
+import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
 import cors, { CorsOptions } from "cors";
+import cookieParser from "cookie-parser";
 
 
 // Use dotenv package to use envirenment variable
@@ -13,9 +14,8 @@ dotenv.config();
 const app: Express = express();// Create Object instance from express
 const PORT = process.env.PORT || 4000;// Get PRT from .env file
 
-
-// Express built-in middleware for parsing JSON
-app.use(express.json());
+app.use(express.json());// Express built-in middleware for parsing JSON
+app.use(cookieParser());// Get info from cookie
 
 const corsOptions: CorsOptions = {
   origin: 'http://localhost:3000', // Allow only requests from this origin

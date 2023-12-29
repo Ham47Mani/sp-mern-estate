@@ -4,7 +4,6 @@ import { HttpStatusCode } from "../utils/httpStatusCodes";
 import userModel from "../models/user.model";
 import { createItem, getItem } from "../utils/mongooseCruds";
 import { handleResponseError, handleResponseSuccess } from "../utils/handleResponse";
-import { USER } from "../utils/modale.type";
 import { generateToken } from "../utils/jwtToken";
 import { JwtPayload } from "jsonwebtoken";
 
@@ -55,7 +54,7 @@ export const signin = asyncHandler(async (req: Request, res: Response): Promise<
       return;
     }
     // Create JWT token
-    const token: string | JwtPayload = await generateToken(user._id)
+    const token: string | JwtPayload = await generateToken(user._id);
     // Send cookie with name "access_token" and value is jwt token
     res.cookie('access_token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
     const {password: pass, ...rest} = user._doc;
@@ -81,7 +80,6 @@ export const signInWithGoogle = asyncHandler(async (req: Request, res: Response)
       // Create JWT token
       const token: string | JwtPayload = await generateToken(existingUser._id)
       // Send cookie with name "access_token" and value is jwt token
-      res.cookie('access_token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
       const {password: pass, ...rest} = existingUser._doc;
       res.cookie('access_token', token, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
       handleResponseSuccess(res, HttpStatusCode.OK, `User ${existingUser.username} login`, [rest]);

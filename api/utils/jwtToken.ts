@@ -7,7 +7,7 @@ const secretKey: string = process.env.JWT_SECRET_KEY || "32e8d10c873e804a28208b"
 // ----------------- Generate token -----------------
 export const generateToken = async (id: string, expire: string = '1d'): Promise<string | JwtPayload> => {
   const payload = {id};
-  return sign(payload, secretKey, {expiresIn: "3d"});
+  return sign(payload, secretKey, {expiresIn: expire});
 };
 
 // ----------------- Verify token -----------------
