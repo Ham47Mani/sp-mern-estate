@@ -5,7 +5,7 @@ import { handleResponseError, handleResponseSuccess } from "../utils/handleRespo
 import { HttpStatusCode } from "../utils/httpStatusCodes";
 import { isValidObjectId } from "mongoose";
 import { USER } from "../utils/modale.type";
-import { updateItem } from "../utils/mongooseCruds";
+import { deleteItem, updateItem } from "../utils/mongooseCruds";
 import userModel from "../models/user.model";
 import { hashPassword } from "../utils/bcrypt.util";
 
@@ -44,6 +44,34 @@ export const updateUserInfo = asyncHandler(async (req: CustomRequest, res: Respo
       handleResponseSuccess(res, HttpStatusCode.OK, `User ${updatedUser.username} is updated successfully`, [userOtherInfo]);
       return
     }
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
+// ======================= Delete User =======================
+export const deleteUser = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  // Check if user authenticate is the same with the id
+  if(req.user && req?.user.id !== id) {
+    handleResponseError(res, HttpStatusCode.UNAUTHORIZED, "You can only update your own account");
+    return
+  }
+  try {
+    // Delete user
+    await deleteItem(userModel, {_id: id});
+    res.clearCookie("access_token");
+    handleResponseSuccess(res, HttpStatusCode.OK, `User ${req?.user ? req.user.username : ""} deleted successfully`, []);
   } catch (err: any) {
     handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }

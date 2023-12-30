@@ -6,7 +6,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { StorageReference, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../utility/firebaseConfig";
 import { Dispatch } from "@reduxjs/toolkit";
-import { resetError, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, resetError, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
 
 const Profile = () => {
   const dispatch: Dispatch = useDispatch();
@@ -28,13 +28,13 @@ const Profile = () => {
   }
 
   // Handle file change
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
     }
   };
   // Handle file upload
-  const handleFileUpload = (image: File) => {
+  const handleFileUpload = (image: File): void => {
     setFilePerc(0);
     setFileUploadError(null)
     const fileName: string = new Date().getTime() + image.name;
@@ -50,7 +50,7 @@ const Profile = () => {
     });
   }
   // Handle Submit form
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) : Promise<void> => {
     e.preventDefault();
     dispatch(resetError());
     setUpdateSuccess(false);
@@ -72,6 +72,22 @@ const Profile = () => {
       setUpdateSuccess(true);
     } catch (err: any) {
       dispatch(updateUserFailure(err.message));
+    }
+  }
+  // Handle delete user
+  const handleDeleteUser = async (): Promise<void> => {
+    dispatch(resetError());
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`api/users/delete/${user._id}`, {method: 'DELETE'});
+      const data = await res.json();
+      if(data.success == false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess());
+    } catch (err: any) {
+      dispatch(deleteUserFailure(err.message));
     }
   }
   // Check if there's a file upload it
@@ -115,7 +131,7 @@ const Profile = () => {
       </form>
       {/* -------- Form -------- */}
       <div className="flex justify-between items-center mt-5">
-        <span className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Delete acount</span>
+        <span onClick={handleDeleteUser} className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Delete acount</span>
         <span className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Sign out</span>
       </div>
       {/* ------ Error ------ */}
