@@ -65,6 +65,17 @@ export const signin = asyncHandler(async (req: Request, res: Response): Promise<
   }
 });
 
+// ======================= Sign Out User =======================
+export const signout = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  try {
+    res.clearCookie('access_token');
+    handleResponseSuccess(res, HttpStatusCode.OK, `User has been logged out`, []);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, err.message);
+    return;
+  }
+});
+
 // ======================= Sign In with google User =======================
 export const signInWithGoogle = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   const { username, email, photo } = req.body;

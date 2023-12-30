@@ -6,7 +6,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { StorageReference, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../utility/firebaseConfig";
 import { Dispatch } from "@reduxjs/toolkit";
-import { deleteUserFailure, deleteUserStart, deleteUserSuccess, resetError, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, resetError, signOutUserFailure, signOutUserStart, signOutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
 
 const Profile = () => {
   const dispatch: Dispatch = useDispatch();
@@ -90,12 +90,33 @@ const Profile = () => {
       dispatch(deleteUserFailure(err.message));
     }
   }
+  // Handle sign out user
+  const handleSignOut = async (): Promise<void> => {
+    dispatch(resetError());
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch(`api/auth/signout`, {method: 'GET'});
+      const data = await res.json();
+      if(data.success == false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
+      }
+      dispatch(signOutUserSuccess());
+    } catch (err: any) {
+      dispatch(signOutUserFailure(err.message));
+    }
+  }
   // Check if there's a file upload it
   useEffect(() => {
     if(file) {
       handleFileUpload(file);
     }
   }, [file]);
+  // Clear the error when refresh the page
+  useEffect(() => {
+    dispatch(resetError());
+  }, []);
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       {/* -------- Heading -------- */}
@@ -132,7 +153,7 @@ const Profile = () => {
       {/* -------- Form -------- */}
       <div className="flex justify-between items-center mt-5">
         <span onClick={handleDeleteUser} className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Delete acount</span>
-        <span className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Sign out</span>
+        <span onClick={handleSignOut} className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Sign out</span>
       </div>
       {/* ------ Error ------ */}
       {error && <p className="text-red-700 mt-5">{error}</p>}
