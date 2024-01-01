@@ -6,6 +6,7 @@ import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
 import cors, { CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
+import listingRouter from "./routes/listing.route";
 
 
 // Use dotenv package to use envirenment variable
@@ -31,6 +32,7 @@ connectToDB(databaseURL);// Connect to "SpaiderEstate" Database
 // Routes
 app.use("/api/users", userRouter);// User Routes
 app.use("/api/auth", authRouter);// Auth Routes
+app.use("/api/listings", listingRouter);// Listing Routes
 
 // Error Middleware
 app.use(notFound);
