@@ -7,6 +7,7 @@ import { StorageReference, getDownloadURL, ref, uploadBytesResumable } from "fir
 import { storage } from "../utility/firebaseConfig";
 import { Dispatch } from "@reduxjs/toolkit";
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, resetError, signOutUserFailure, signOutUserStart, signOutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const dispatch: Dispatch = useDispatch();
@@ -149,6 +150,7 @@ const Profile = () => {
         <button type="submit" disabled={loading} className="bg-slate-700 p-3 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link to={"/create-listing"} className="bg-green-700 text-white uppercase p-3 rounded-lg text-center hover:opacity-95">Create Listing</Link>
       </form>
       {/* -------- Form -------- */}
       <div className="flex justify-between items-center mt-5">
