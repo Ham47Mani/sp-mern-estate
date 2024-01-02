@@ -1,5 +1,81 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { StorageError, StorageReference, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { ChangeEvent, useState } from "react"
+import { storage } from "../utility/firebaseConfig";
+import { LISTING } from "../utility/types";
+import { MdDelete } from "react-icons/md";
+import { CgSpinnerTwo } from "react-icons/cg";
 
 const CreateListing = () => {
+  const [images, setImages] = useState<FileList | null>(null);
+  const [imagesUploadsError, setImagesUploadsError] = useState<string>("");
+  const [imagesUploadsLoading, setImagesUploadsLoading] = useState<boolean>(false);
+  const [formData, setFormData] = useState<LISTING>({
+    name: "",
+    description: "",
+    address: "",
+    regularPrice: 0,
+    discountPrice: 0,
+    bathRooms: 0,
+    badRooms: 0,
+    furnished: false,
+    parking: false,
+    type: "sell",
+    offer: false,
+    imageURLs: [],
+  });
+
+  // Handle input file change
+  const handleFilChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setImages(e.target.files);
+  }
+
+  // Handle images submit
+  const handleImagesSubmit = async (): Promise<void> => {
+    if( images && images.length > 0 && images.length + formData.imageURLs.length < 7) {
+      setImagesUploadsLoading(true);
+      const promises = [];
+      for(let i = 0; i < images.length; i++) {
+        promises.push(storeImage(images[i]));
+      }
+      setImagesUploadsError("");
+      Promise.all(promises).then((url: any) => {
+        setFormData({...formData, imageURLs: formData.imageURLs.concat(url)});
+        setImagesUploadsLoading(false);
+      }).catch(() => {
+        setImagesUploadsError("Image uploads failed (2 mb max per image)");
+        setImagesUploadsLoading(false);
+      });
+    } else if (!images || (images && images.length <= 0)) {
+      setImagesUploadsError("Please select images to uploads before click upload button");
+      return;
+    } else {
+      setImagesUploadsError("You can only uploads 6 images per listing");
+      return;
+    }
+  }
+  
+  // Upload image
+  const storeImage = async(image : File) => {
+    return new Promise((resolve, reject) => {
+      const imageName: string = new Date().getTime() + image.name;
+      const storageRef: StorageReference = ref(storage, "/listing/" + imageName);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+      uploadTask.on('state_changed',null,
+        (error: StorageError) => reject(error),
+        () => getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => resolve(downloadURL))
+      );
+    })
+  }
+
+  // Handle Delete Image
+  const handleDeleteImage = (imageIndex: number) => {
+    setFormData({
+      ...formData,
+      imageURLs: formData.imageURLs.filter((_, i) => i !== imageIndex)
+    });
+  }
+
   return (
     <main className="p-3 max-w-5xl mx-auto">
       {/* -------- Title -------- */}
@@ -68,9 +144,32 @@ const CreateListing = () => {
           </p>
           {/* -------- Input File -------- */}
           <div className="flex gap-4">
-            <input type="file" name="images" id="images" accept="image/*" multiple className="p-3 border border-gray-300 rounded-lg w-full"/>
-            <button className="p-3 rounded-lg uppercase text-green-700 border border-green-700 hover:shadow-lg disabled:opacity-80">Upload</button>
+            <input type="file" name="images" id="images" accept="image/*" multiple onChange={handleFilChange} className="p-3 border border-gray-300 rounded-lg w-full"/>
+            <button type="button" disabled={imagesUploadsLoading} onClick={handleImagesSubmit} className="p-3 rounded-lg uppercase text-green-700 border border-green-700 hover:shadow-lg disabled:opacity-80 min-w-24">
+              {imagesUploadsLoading ? <CgSpinnerTwo className='animate-spin text-3xl mx-auto' /> : "Upload"}
+            </button>
           </div>
+          {/* -------- Showing Images -------- */}
+          {
+            formData.imageURLs.length > 0 && (
+              <div>
+                {
+                  formData.imageURLs.map((imageurl, index) => (
+                    <div className="flex justify-between items-center p-3 border" key={imageurl}>
+                      <img src={imageurl} alt="listing image" className="w-20 h-20 object-contain rounded-lg" />
+                      <button type="button" onClick={() => handleDeleteImage(index)} className="p-3 text-red-700 uppercase rounded-lg hover:opacity-75 text-4xl" >
+                        <MdDelete />
+                      </button>
+                    </div>
+                  ))
+                }
+              </div>
+            )
+          }
+          {/* -------- Error -------- */}
+          {imagesUploadsError && (
+            <p className="text-red-700 text-sm">{imagesUploadsError}</p>
+          )}
           {/* -------- Button -------- */}
           <button className="p-3 bg-slate-700 text-white uppercase rounded-lg hover:opacity-95 disabled:opacity-80">Create Listing</button>
         </div>
