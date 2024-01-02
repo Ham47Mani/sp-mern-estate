@@ -7,6 +7,7 @@ import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { resetError, signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 import { useSelector } from "react-redux";
 import OAuth from "../components/OAuth";
+import { CgSpinnerTwo } from "react-icons/cg";
 
 // Interface of user inputs data
 interface FORMDATA {
@@ -67,7 +68,7 @@ const SignIn = () => {
         <input type="email" name="email" id="email" placeholder="Email" className="border p-3 rounded-lg" onChange={handleChange}/>
         <input type="password" name="password" id="password" placeholder="Password" className="border p-3 rounded-lg" onChange={handleChange}/>
         <button type="submit" disabled={loading} className="bg-slate-700 p-3 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
-          {loading ? "loading..." : "Sign In"}
+          {loading ?  <CgSpinnerTwo className='animate-spin text-3xl mx-auto' /> : "Sign In"}
         </button>
         <OAuth />
       </form>
