@@ -12,8 +12,8 @@ export const createListing = asyncHandler(async (req: CustomRequest, res: Respon
   try {
     // Get listing info from request body & check if all fields sended
     const listingInfo: LISTING = req.body;
-    if(!listingInfo.name || !listingInfo.description || !listingInfo.address || !listingInfo.regularPrice || !listingInfo.discountPrice || !listingInfo.bathRooms || !listingInfo.badRooms || !listingInfo.furnished || !listingInfo.parking || !listingInfo.type || !listingInfo.offer) {
-      handleResponseError(res, HttpStatusCode.BADREQUEST, `All fields is required (name, description, address, regularPrice, discountPrice, discountPrice, bathRomms, badRooms, furnished, parking, type, offer)`);
+    if(!listingInfo.name || !listingInfo.description || !listingInfo.address || !listingInfo.regularPrice || !listingInfo.bathRooms || !listingInfo.badRooms || !listingInfo.type) {
+      handleResponseError(res, HttpStatusCode.BADREQUEST, `All fields is required (name, description, address, regularPrice, bathRooms, badRooms, furnished, parking, type, offer)`);
       return;
     }
     listingInfo.userRef= req.user ? req.user.id : ""
