@@ -14,6 +14,7 @@ export interface USER {
 
 // ---------------- User Modal Type ----------------
 export interface LISTING {
+  _id?: number,
   name: string,
   description: string,
   address: string,

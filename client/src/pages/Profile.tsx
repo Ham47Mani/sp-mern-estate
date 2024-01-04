@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useDispatch, useSelector } from "react-redux";
-import { USER } from "../utility/types";
+import { LISTING, USER } from "../utility/types";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { StorageReference, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../utility/firebaseConfig";
 import { Dispatch } from "@reduxjs/toolkit";
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, resetError, signOutUserFailure, signOutUserStart, signOutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
 import { Link } from "react-router-dom";
+import { MdDelete, MdEditDocument } from "react-icons/md";
 
 const Profile = () => {
   const dispatch: Dispatch = useDispatch();
@@ -19,6 +20,9 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
   const [formData, setFormData] = useState<USER>(user);
   const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
+  const [showListingsError, setShowListingsError] = useState<string | null>(null);
+  const [userListings, setUserListings] = useState<LISTING[]>([]);
+
   // Handle inputs change
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;
@@ -107,12 +111,29 @@ const Profile = () => {
       dispatch(signOutUserFailure(err.message));
     }
   }
+  // Handle Show Listings
+  const handleShowListings = async(): Promise<void> => {
+    setShowListingsError(null);
+    try {
+      const res = await fetch('/api/users/listings', {method: "GET"});
+      const data = await res.json();
+      if(!data.success) {
+        setShowListingsError(data.message);
+        return;
+      }
+      setUserListings(data.data);
+    } catch (err: any) {
+      setShowListingsError(err.message);
+    }
+  }
+
   // Check if there's a file upload it
   useEffect(() => {
     if(file) {
       handleFileUpload(file);
     }
   }, [file]);
+
   // Clear the error when refresh the page
   useEffect(() => {
     dispatch(resetError());
@@ -152,15 +173,49 @@ const Profile = () => {
         </button>
         <Link to={"/create-listing"} className="bg-green-700 text-white uppercase p-3 rounded-lg text-center hover:opacity-95">Create Listing</Link>
       </form>
-      {/* -------- Form -------- */}
+      {/* -------- Buttons -------- */}
       <div className="flex justify-between items-center mt-5">
         <span onClick={handleDeleteUser} className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Delete acount</span>
         <span onClick={handleSignOut} className="text-red-700 hover:text-red-500 cursor-pointer text-lg">Sign out</span>
       </div>
-      {/* ------ Error ------ */}
+      {/* ------ Update Info Error ------ */}
       {error && <p className="text-red-700 mt-5">{error}</p>}
-      {/* ------ Success ------ */}
+      {/* ------ Update Info Success ------ */}
       {updateSuccess ? <p className="text-green-700 mt-5">User updated successfully!</p> : ""}
+      {/* ------ Show Listings Button ------ */}
+      <button onClick={handleShowListings} className="capitalize text-green-700 hover:text-green-600 w-full my-6 font-semibold">Show Listings</button>
+      {/* ------ Show Listings Error ------ */}
+      {showListingsError && <p className="text-red-700 mt-5">{showListingsError}</p>}
+      {/* ------ Show Listings Boxs ------ */}
+      {
+        userListings.length > 0 && (
+          <div className="flex flex-col gap-6">
+            <h2 className="text-center font-semibold text-slate-900 text-2xl my-3">Your Listings :</h2>
+            {
+              userListings.map(listing => (
+                /* ------ Listing Box ------ */
+                <div className="flex items-center justify-between border gap-6 border-slate-300 rounded-lg px-3" key={listing._id}>
+                  {/* ------ Listing image ------ */}
+                  <Link to={`listing/${listing._id}`}>
+                    <img src={listing.imageURLs[0]} alt={listing.name} className="w-24 h-24 object-contain rounded-lg"/>
+                  </Link>
+                  {/* ------ Listing name ------ */}
+                  <Link to={`listing/${listing._id}`} className="text-slate-700 text-lg font-semibold flex-1 truncate hover:underline underline-offset-4">{listing.name}</Link>
+                  {/* ------ Listing manipulate ------ */}
+                  <div className="flex flex-col items-center gap-2">
+                    <button className="text-red-700 text-2xl">
+                      <MdDelete />
+                    </button>
+                    <button className="text-green-700 text-2xl">
+                      <MdEditDocument />
+                    </button>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        )
+      }
     </div>
   )
 }
