@@ -4,10 +4,11 @@ import { CustomRequest } from "../utils/costume.type";
 import { handleResponseError, handleResponseSuccess } from "../utils/handleResponse";
 import { HttpStatusCode } from "../utils/httpStatusCodes";
 import { isValidObjectId } from "mongoose";
-import { USER } from "../utils/modale.type";
-import { deleteItem, updateItem } from "../utils/mongooseCruds";
+import { LISTING, USER } from "../utils/modale.type";
+import { deleteItem, getItem, getItems, updateItem } from "../utils/mongooseCruds";
 import userModel from "../models/user.model";
 import { hashPassword } from "../utils/bcrypt.util";
+import listingModel from "../models/listing.model";
 
 
 // ======================= Update User Information =======================
@@ -72,6 +73,51 @@ export const deleteUser = asyncHandler(async (req: CustomRequest, res: Response)
     await deleteItem(userModel, {_id: id});
     res.clearCookie("access_token");
     handleResponseSuccess(res, HttpStatusCode.OK, `User ${req?.user ? req.user.username : ""} deleted successfully`, []);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
+// ======================= Get User Listings Information =======================
+export const getUserListings = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  try {
+    // Get user id
+    const id = req.user?.id;
+    // Get user listings
+    const userListings: LISTING[] = await getItems(listingModel, {userRef: id});
+    if(!userListings) {
+      handleResponseError(res, HttpStatusCode.NOTFOUND, `this user (${req.user?.username}) does not have any Listing`);
+      return
+    }
+    handleResponseSuccess(res, HttpStatusCode.OK, `User ${req.user?.username} Listings`, [...userListings]);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
+// ======================= Get a single user listing Information =======================
+export const getUserListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  try {
+    // Get user id
+    const userID = req.user?.id;
+    // Get user listings
+    const userListings: LISTING | null = await getItem(listingModel, {userRef: userID, _id: id});
+    if(!userListings) {
+      handleResponseError(res, HttpStatusCode.NOTFOUND, `This listing not exists`);
+      return
+    }
+    handleResponseSuccess(res, HttpStatusCode.OK, `User ${req.user?.username} Listing ${userListings.name} : `, [userListings]);
   } catch (err: any) {
     handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }
