@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { handleResponseError, handleResponseSuccess } from '../utils/handleResponse';
 import { HttpStatusCode } from '../utils/httpStatusCodes';
 import { LISTING } from '../utils/modale.type';
-import { createItem, deleteItem, getItem } from '../utils/mongooseCruds';
+import { createItem, deleteItem, getItem, updateItem } from '../utils/mongooseCruds';
 import listingModel from '../models/listing.model';
 import { isValidObjectId } from 'mongoose';
 
@@ -30,6 +30,40 @@ export const createListing = asyncHandler(async (req: CustomRequest, res: Respon
   }
 });
 
+// ======================= Update a Listing =======================
+export const updateListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  try {
+    // Check if the listing is exists
+    const listing: LISTING | null = await getItem(listingModel, {_id: id});
+    if(!listing) {
+      handleResponseError(res, HttpStatusCode.BADREQUEST, "This listing does not exists");
+      return
+    }
+    if (req.user && String(listing.userRef) !== String(req.user.id)) {
+      handleResponseError(res, HttpStatusCode.UNAUTHORIZED, "You can only delete your own listings");
+      return
+    }
+    // Update Listing
+    const updatedListing: LISTING | null = await updateItem(listingModel, {_id: id}, {...req.body});
+    if(updatedListing) {
+      handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${updatedListing.name} updated successfully`, [updatedListing]);
+    }
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
 // ======================= Delete a Listing =======================
 export const deleteListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
   const {id} = req.params;
@@ -51,7 +85,7 @@ export const deleteListing = asyncHandler(async (req: CustomRequest, res: Respon
       return
     }
     if (req.user && String(listing.userRef) !== String(req.user.id)) {
-      handleResponseError(res, HttpStatusCode.BADREQUEST, "You can only delete your own listings");
+      handleResponseError(res, HttpStatusCode.UNAUTHORIZED, "You can only delete your own listings");
       return
     }
     // Delete Listing
