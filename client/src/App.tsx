@@ -9,6 +9,7 @@ import Layout from "./components/Layout";
 import PrivetRoute from "./components/PrivetRoute";
 import RedirectToPRofile from "./components/RedirectToPRofile";
 import CreateListing from "./pages/CreateListing";
+import UpdateListing from "./pages/UpdateListing";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route element={<PrivetRoute />} >
             <Route path="profile" element={<Profile />} />
             <Route path="create-listing" element={<CreateListing />} />
+            <Route path="update-listing/:listingID" element={<UpdateListing />} />
           </Route>
           {/* --- Not allow user authenticate to go to SignIn|SignOut page --- */}
           <Route element={<RedirectToPRofile />} >

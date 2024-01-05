@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { StorageError, StorageReference, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { storage } from "../utility/firebaseConfig";
 import { LISTING } from "../utility/types";
 import { MdDelete } from "react-icons/md";
 import { CgSpinnerTwo } from "react-icons/cg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreateListing = () => {
+const UpdateListing = () => {
   const [images, setImages] = useState<FileList | null>(null);
   const [imagesUploadsError, setImagesUploadsError] = useState<string>("");
   const [imagesUploadsLoading, setImagesUploadsLoading] = useState<boolean>(false);
@@ -27,7 +27,7 @@ const CreateListing = () => {
   const [submitError, setSubmitError] = useState<string>("");
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-
+  const {listingID} = useParams();
   // Handle input file change
   const handleFilChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setImages(e.target.files);
@@ -116,8 +116,8 @@ const CreateListing = () => {
     try {
       setSubmitLoading(true)
       setSubmitError("");
-      const res = await fetch('/api/listings/create', {
-        method: 'POST',
+      const res = await fetch(`/api/listings/update/${listingID}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -135,10 +135,26 @@ const CreateListing = () => {
     }
   }
 
+  // Fetch data when component created
+  useEffect(() => {
+    // Create Fetch listing method
+    const fetchListing = async () => {
+      const res = await fetch(`/api//listings/${listingID}`);
+      const data = await res.json();
+      if (!data.success) {
+        console.log("Error : ", data.message);
+        return;
+      }
+      setFormData(data.data[0]);
+      return;      
+    }
+    fetchListing();
+  }, [listingID]);
+
   return (
     <main className="p-3 max-w-5xl mx-auto">
       {/* -------- Title -------- */}
-      <h1 className="text-3xl font-semibold text-center my-7">Create a Listing</h1>
+      <h1 className="text-3xl font-semibold text-center my-7">Update a Listing</h1>
       {/* -------- Form -------- */}
       <form onSubmit={handleSubmitForm} className="flex flex-col lg:flex-row gap-4">
         <div className="flex flex-col gap-4 flex-1">
@@ -189,13 +205,13 @@ const CreateListing = () => {
                 formData.type === "rent" && (
                   <span className="text-sm">($ / month)</span>
                 )
-              }
+              }              
             </div>
           </div>
           {
             formData.offer && (
               <div className="flex gap-2 items-center px-3">
-                <input type="number" name="discountPrice" id="discountPrice" min={1} max={90000000} defaultValue={10000} value={formData.discountPrice} onChange={handleInputsChange} required  className="p-3 border border-gray-300 rounded-lg w-32 lg:w-auto"/>
+                <input type="number" name="discountPrice" id="discountPrice" min={1} max={90000000} value={formData.discountPrice} onChange={handleInputsChange} required  className="p-3 border border-gray-300 rounded-lg w-32 lg:w-auto"/>
                 <div className="flex flex-col items-center">
                   <p>Discount Price</p>
                   {
@@ -243,7 +259,7 @@ const CreateListing = () => {
           )}
           {/* -------- Button -------- */}
           <button disabled={submitLoading} className="p-3 bg-slate-700 text-white uppercase rounded-lg hover:opacity-95 disabled:opacity-80">
-            {submitLoading ? <CgSpinnerTwo className='animate-spin text-3xl mx-auto' /> : "Create Listing"}
+            {submitLoading ? <CgSpinnerTwo className='animate-spin text-3xl mx-auto' /> : "Update Listing"}
           </button>
           {/* -------- Error Uploading images -------- */}
           {submitError && (
@@ -255,4 +271,4 @@ const CreateListing = () => {
   )
 }
 
-export default CreateListing
+export default UpdateListing

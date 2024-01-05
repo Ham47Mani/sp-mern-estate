@@ -94,31 +94,3 @@ export const getUserListings = asyncHandler(async (req: CustomRequest, res: Resp
     handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }
 });
-
-// ======================= Get a single user listing Information =======================
-export const getUserListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
-  const {id} = req.params;
-  // Check if 'id' not exists
-  if(!id) {
-    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
-    return
-  }
-  // Check if id is valid
-  if(!isValidObjectId(id)) {
-    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
-    return
-  }
-  try {
-    // Get user id
-    const userID = req.user?.id;
-    // Get user listings
-    const userListings: LISTING | null = await getItem(listingModel, {userRef: userID, _id: id});
-    if(!userListings) {
-      handleResponseError(res, HttpStatusCode.NOTFOUND, `This listing not exists`);
-      return
-    }
-    handleResponseSuccess(res, HttpStatusCode.OK, `User ${req.user?.username} Listing ${userListings.name} : `, [userListings]);
-  } catch (err: any) {
-    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
-  }
-});

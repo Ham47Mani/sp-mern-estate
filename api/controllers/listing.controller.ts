@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { CustomRequest } from '../utils/costume.type';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { handleResponseError, handleResponseSuccess } from '../utils/handleResponse';
 import { HttpStatusCode } from '../utils/httpStatusCodes';
 import { LISTING } from '../utils/modale.type';
@@ -91,6 +91,32 @@ export const deleteListing = asyncHandler(async (req: CustomRequest, res: Respon
     // Delete Listing
     await deleteItem(listingModel, {_id: id});
     handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${listing.name} deleted successfully`, []);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
+// ======================= Get a single user listing Information =======================
+export const getListing = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  try {
+    // Get user listings
+    const userListings: LISTING | null = await getItem(listingModel, {_id: id});
+    if(!userListings) {
+      handleResponseError(res, HttpStatusCode.NOTFOUND, `This listing not exists`);
+      return
+    }
+    handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${userListings.name} : `, [userListings]);
   } catch (err: any) {
     handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }

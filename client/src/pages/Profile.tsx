@@ -228,9 +228,9 @@ const Profile = () => {
                     <button onClick={() => handleDeleteListing(listing._id ? listing._id : "")} className="text-red-700 text-2xl">
                       <MdDelete />
                     </button>
-                    <button className="text-green-700 text-2xl">
+                    <Link to={`/update-listing/${listing._id ? listing._id : ""}`} className="text-green-700 text-2xl">
                       <MdEditDocument />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))
