@@ -127,6 +127,28 @@ const Profile = () => {
     }
   }
 
+  // Delete Listing
+  const handleDeleteListing = async (listingID: string) => {
+    try {
+      if(listingID === "") {
+        console.log("Check the id of listing, there's not exists");
+        return;
+      }
+      // Delete listing
+      const res = await fetch(`/api/listings/delete/${listingID}`, {method: "DELETE"});
+      const data = await res.json();
+      // Check if there's no error
+      if(!data.success) {
+        console.log(data.message);
+        return;
+      }
+      // Update user listings state
+      setUserListings(prev => prev.filter(listing => listing._id !== listingID));
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  }
+
   // Check if there's a file upload it
   useEffect(() => {
     if(file) {
@@ -203,7 +225,7 @@ const Profile = () => {
                   <Link to={`listing/${listing._id}`} className="text-slate-700 text-lg font-semibold flex-1 truncate hover:underline underline-offset-4">{listing.name}</Link>
                   {/* ------ Listing manipulate ------ */}
                   <div className="flex flex-col items-center gap-2">
-                    <button className="text-red-700 text-2xl">
+                    <button onClick={() => handleDeleteListing(listing._id ? listing._id : "")} className="text-red-700 text-2xl">
                       <MdDelete />
                     </button>
                     <button className="text-green-700 text-2xl">

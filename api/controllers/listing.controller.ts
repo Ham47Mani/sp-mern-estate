@@ -4,10 +4,11 @@ import { Response } from 'express';
 import { handleResponseError, handleResponseSuccess } from '../utils/handleResponse';
 import { HttpStatusCode } from '../utils/httpStatusCodes';
 import { LISTING } from '../utils/modale.type';
-import { createItem } from '../utils/mongooseCruds';
+import { createItem, deleteItem, getItem } from '../utils/mongooseCruds';
 import listingModel from '../models/listing.model';
+import { isValidObjectId } from 'mongoose';
 
-// ======================= Update User Information =======================
+// ======================= Create a Listing =======================
 export const createListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     // Get listing info from request body & check if all fields sended
@@ -22,9 +23,41 @@ export const createListing = asyncHandler(async (req: CustomRequest, res: Respon
       handleResponseError(res, HttpStatusCode.BADREQUEST, `Create new item error from createListing function`);
       return;
     }
-    handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${newListing.name} created successfully`, [newListing]);
+    handleResponseSuccess(res, HttpStatusCode.CREATED, `Listing ${newListing.name} created successfully`, [newListing]);
   } catch (err: any) {
     handleResponseError(res, HttpStatusCode.BADREQUEST, err.message);
     return;
+  }
+});
+
+// ======================= Delete a Listing =======================
+export const deleteListing = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  try {
+    // Check if the listing is exists
+    const listing: LISTING | null = await getItem(listingModel, {_id: id});
+    if(!listing) {
+      handleResponseError(res, HttpStatusCode.BADREQUEST, "This listing does not exists");
+      return
+    }
+    if (req.user && String(listing.userRef) !== String(req.user.id)) {
+      handleResponseError(res, HttpStatusCode.BADREQUEST, "You can only delete your own listings");
+      return
+    }
+    // Delete Listing
+    await deleteItem(listingModel, {_id: id});
+    handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${listing.name} deleted successfully`, []);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }
 });
