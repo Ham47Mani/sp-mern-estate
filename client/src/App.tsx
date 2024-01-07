@@ -10,6 +10,7 @@ import PrivetRoute from "./components/PrivetRoute";
 import RedirectToPRofile from "./components/RedirectToPRofile";
 import CreateListing from "./pages/CreateListing";
 import UpdateListing from "./pages/UpdateListing";
+import Listing from "./pages/Listing";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/" element={<Layout/>}>
           <Route path="" index element={<Home />}/>
           <Route path="about" element={<About />} />
+          <Route path="listing/:listingID" element={<Listing />} />
           {/* --- Protect the profile page --- */}
           <Route element={<PrivetRoute />} >
             <Route path="profile" element={<Profile />} />
