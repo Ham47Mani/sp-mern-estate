@@ -5,17 +5,21 @@ import { LISTING } from "../utility/types";
 import { CgSpinnerTwo } from "react-icons/cg";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation} from "swiper/modules";
+import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare } from "react-icons/fa";
+import { useSelector } from "react-redux";
 // Import Swiper styles
 import "swiper/css/bundle";
-import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare } from "react-icons/fa";
+import ContactLandlord from "../components/ContactLandlord";
 
 const Listing = () => {
   const {listingID} = useParams();// Get Listing ID from url
+  const {currentUser} = useSelector((state: any) => state.user.user);
   const [listing, setListing] = useState<LISTING | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
-
+  const [showContact, setShowContact] = useState<boolean>(false);
+  
   // Fetch the listing with listingID
   useEffect(() => {
     const getListing = async () => {
@@ -42,7 +46,7 @@ const Listing = () => {
     <main>
       {/* ------------ Loading ------------ */}
       {
-        loading && <CgSpinnerTwo className='animate-spin text-5xl text-slate-500' />
+        loading && <CgSpinnerTwo className='animate-spin text-5xl text-slate-500 my-28 mx-auto' />
       }
       {/* ------------ Error ------------ */}
       {
@@ -141,6 +145,16 @@ const Listing = () => {
                   {listing.parking ? `Furnished` : `Unfurnished`}
                 </li>
               </ul>
+              {/* ---------- Listing Contact Landlord Button ---------- */}
+              {
+                currentUser && (listing.userRef !== currentUser[0]._id) && !showContact && (
+                  <button onClick={() => setShowContact(true)} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95">Contact Landlord</button>
+                )
+              }
+              {/* ---------- Listing Contact Landlord form ---------- */}
+              {
+                currentUser && (listing.userRef !== currentUser[0]._id) && showContact && <ContactLandlord listing={listing}/>
+              }
             </div>
           </>
         )

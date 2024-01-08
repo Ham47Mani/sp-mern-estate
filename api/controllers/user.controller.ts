@@ -78,6 +78,33 @@ export const deleteUser = asyncHandler(async (req: CustomRequest, res: Response)
   }
 });
 
+// ======================= Get User Information =======================
+export const getUser = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
+  const {id} = req.params;
+  // Check if 'id' not exists
+  if(!id) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "ID is required");
+    return
+  }
+  // Check if id is valid
+  if(!isValidObjectId(id)) {
+    handleResponseError(res, HttpStatusCode.BADREQUEST, "This 'id' is not valid");
+    return
+  }
+  try {
+    // Get user info
+    const user: any = await getItem(userModel, {_id: id});
+    if(!user) {
+      handleResponseError(res, HttpStatusCode.NOTFOUND, `this user does not exists`);
+      return
+    }
+    const {password: pass, ...restUserInfo} = user._doc;
+    handleResponseSuccess(res, HttpStatusCode.OK, `User ${user.username}`, [restUserInfo]);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
 // ======================= Get User Listings Information =======================
 export const getUserListings = asyncHandler(async (req: CustomRequest, res: Response): Promise<void> => {
   try {

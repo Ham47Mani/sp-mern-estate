@@ -128,7 +128,7 @@ const CreateListing = () => {
       if (data.success === false) {
         setSubmitError(data.message)
       }
-      navigate(`listing/${data.data[0]._id}`);
+      navigate(`/listing/${data.data[0]._id}`);
     } catch (err: any) {
       setSubmitError(err.message);
       setSubmitLoading(false);
