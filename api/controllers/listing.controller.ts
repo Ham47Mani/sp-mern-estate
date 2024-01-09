@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { handleResponseError, handleResponseSuccess } from '../utils/handleResponse';
 import { HttpStatusCode } from '../utils/httpStatusCodes';
 import { LISTING } from '../utils/modale.type';
-import { createItem, deleteItem, getItem, updateItem } from '../utils/mongooseCruds';
+import { createItem, deleteItem, getItem, getItems, updateItem } from '../utils/mongooseCruds';
 import listingModel from '../models/listing.model';
 import { isValidObjectId } from 'mongoose';
 
@@ -117,6 +117,35 @@ export const getListing = asyncHandler(async (req: Request, res: Response): Prom
       return
     }
     handleResponseSuccess(res, HttpStatusCode.OK, `Listing ${userListings.name} : `, [userListings]);
+  } catch (err: any) {
+    handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
+  }
+});
+
+// ======================= Get all listings Information =======================
+export const getListings = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Pagination
+    const limit: string = req.query.limit ? req.query.limit.toString() : "10";
+    const page: string = req.query.page ? req.query.page.toString()  : "1";
+    // Sanitize fields
+    let offer = (req.query.offer === undefined || Boolean(req.query.offer) === false) ? {$in: [false, true]} : Boolean(req.query.offer);
+    let parking = (req.query.parking === undefined || Boolean(req.query.parking) === false) ? {$in: [false, true]} : Boolean(req.query.parking);
+    let furnished = (req.query.furnished === "undefined" || Boolean(req.query.furnished) === false) ? {$in: [false, true]} : Boolean(req.query.furnished);
+    let type = (req.query.type === undefined || req.query.type === "all") ? {$in: ["rent", "sell"]} : req.query.type?.toString();
+    let searchTerm = req.query.searchTerm ? req.query.searchTerm.toString() : "";
+    let sort: string = req.query.sort ? req.query.sort.toString() : "";
+    
+    // Get listings
+    const listings: LISTING[] | null = await getItems(listingModel, {
+      name: {$regex: searchTerm, $options: 'i'}, offer, parking, furnished, type
+    }, sort, "", page, limit);
+
+    if(!listings) {
+      handleResponseError(res, HttpStatusCode.NOTFOUND, `There's no listings`);
+      return
+    }
+    handleResponseSuccess(res, HttpStatusCode.OK, `Listings ${listings.length} : `, [...listings]);
   } catch (err: any) {
     handleResponseError(res, HttpStatusCode.INTERNALSERVERERROR, err.message);
   }
