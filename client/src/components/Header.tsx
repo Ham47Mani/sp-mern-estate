@@ -1,11 +1,32 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {FaSearch} from "react-icons/fa"
 import { useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom"
+import { Link, NavLink, useNavigate } from "react-router-dom"
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 const Header = () => {
   const {currentUser} = useSelector((state: any) => state.user.user);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const navigate = useNavigate();
+
+  // Handle search submit form
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(window.location.search);// get all params from url
+    urlParams.set('searchTerm', searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  }
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);// get all params from url
+    const searchTermUrl = urlParams.get('searchTerm');
+    if(searchTermUrl) {
+      setSearchTerm(searchTermUrl)
+    }
+  }, [location.search]);
 
   return (
     <header className="bg-slate-200 shadow-md">
@@ -19,9 +40,13 @@ const Header = () => {
           </h1>
         </Link>
         {/* -------- Search Bar -------- */}
-        <form className="bg-slate-100 py-1 px-3 rounded-lg flex items-center">
-          <input type="text" name="search" placeholder="Search..." className="bg-transparent focus:outline-none w-32 sm:w-64 lg:w-80"/>
-          <FaSearch className="text-slate-600 cursor-pointer" />
+        <form onSubmit={handleFormSubmit} className="bg-slate-100 py-1 px-3 rounded-lg flex items-center">
+          <input type="text" name="search" placeholder="Search..." className="bg-transparent focus:outline-none w-32 sm:w-64 lg:w-80"
+            value={searchTerm} onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          />
+          <button>
+            <FaSearch className="text-slate-600 cursor-pointer" />
+          </button>
         </form>
         {/* -------- Menu -------- */}
         <div className="flex items-center gap-4">
