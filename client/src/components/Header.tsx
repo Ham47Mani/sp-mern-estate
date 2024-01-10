@@ -40,12 +40,12 @@ const Header = () => {
           </h1>
         </Link>
         {/* -------- Search Bar -------- */}
-        <form onSubmit={handleFormSubmit} className="bg-slate-100 py-1 px-3 rounded-lg flex items-center">
-          <input type="text" name="search" placeholder="Search..." className="bg-transparent focus:outline-none w-32 sm:w-64 lg:w-80"
+        <form onSubmit={handleFormSubmit} className="bg-slate-100 rounded-lg flex items-center">
+          <input type="text" name="search" placeholder="Search..." className="bg-transparent py-1 px-3 focus:outline-none w-32 sm:w-64 lg:w-80"
             value={searchTerm} onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           />
-          <button>
-            <FaSearch className="text-slate-600 cursor-pointer" />
+          <button className="text-slate-600 cursor-pointer py-2 px-3">
+            <FaSearch />
           </button>
         </form>
         {/* -------- Menu -------- */}

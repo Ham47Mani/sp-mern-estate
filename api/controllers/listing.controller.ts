@@ -129,9 +129,9 @@ export const getListings = asyncHandler(async (req: Request, res: Response): Pro
     const limit: string = req.query.limit ? req.query.limit.toString() : "10";
     const page: string = req.query.page ? req.query.page.toString()  : "1";
     // Sanitize fields
-    let offer = (req.query.offer === undefined || Boolean(req.query.offer) === false) ? {$in: [false, true]} : Boolean(req.query.offer);
-    let parking = (req.query.parking === undefined || Boolean(req.query.parking) === false) ? {$in: [false, true]} : Boolean(req.query.parking);
-    let furnished = (req.query.furnished === "undefined" || Boolean(req.query.furnished) === false) ? {$in: [false, true]} : Boolean(req.query.furnished);
+    let offer = (req.query.offer === undefined || !req.query.offer) ? {$in: [false, true]} : req.query.offer;
+    let parking = (req.query.parking === undefined || !req.query.parking) ? {$in: [false, true]} : req.query.parking;
+    let furnished = (req.query.furnished === undefined || !req.query.furnished) ? {$in: [false, true]} : req.query.furnished;
     let type = (req.query.type === undefined || req.query.type === "all") ? {$in: ["rent", "sell"]} : req.query.type?.toString();
     let searchTerm = req.query.searchTerm ? req.query.searchTerm.toString() : "";
     let sort: string = req.query.sort ? req.query.sort.toString() : "";
