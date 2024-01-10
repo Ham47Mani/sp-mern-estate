@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { LISTING } from "../utility/types";
 import { CgSpinnerTwo } from "react-icons/cg";
@@ -19,6 +19,7 @@ interface SIDEBARDATASEARCH {
 const Search = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showMore, setShowMore] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [listings, setListings] = useState<LISTING[]>([]);
   const [sidebarDataSearch, setSidebarDataSearch] = useState<SIDEBARDATASEARCH>({
@@ -53,6 +54,44 @@ const Search = () => {
     navigate(`/search?${searchQuery}`);
   }
 
+  // Handle show more listing button
+  const handleShowMoreListing = () => {
+    setShowMore(false);
+    const prevListing: LISTING[] = listings;
+    const urlParams = new URLSearchParams(window.location.search);
+    const limit = urlParams.get("limit") || "10";
+    const page = (prevListing.length / +limit) + 1;
+    urlParams.set("page", page.toString());
+    fetchListings(urlParams, prevListing);
+  }
+
+  // Fetch Listings
+  const fetchListings = useCallback(async (urlParams: URLSearchParams, prevListings: LISTING[] = []) => {
+      try {
+        setLoading(true);
+        setShowMore(false);
+        const searchQuery = urlParams.toString();
+        const res = await fetch(`/api/listings?${searchQuery}`, {method: 'GET'});
+        const data: any = await res.json();
+        if (!data.success) {
+          if(data.message === "Cannot read properties of null (reading 'message')") {
+            setError("");
+            setLoading(false);
+            return;
+          }
+          setError(data.message);
+          setLoading(false);
+          return;
+        }
+        if (data.data.length > 8) { setShowMore(true); }
+        setListings([...data.data, ...prevListings]);
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    },[location.search],
+  );
+
   useEffect(() => {
     // Get params from URL
     const urlParams = new URLSearchParams(location.search);
@@ -73,25 +112,7 @@ const Search = () => {
         sort: sortUrl || sidebarDataSearch.sort
       });
     }
-    // Fetch Listings
-    const fetchListings = async () => {
-      try {
-        setLoading(true);
-        const searchQuery = urlParams.toString();
-        const res = await fetch(`/api/listings?${searchQuery}`, {method: 'GET'});
-        const data: any = await res.json();
-        if (!data.success) {
-          setError(data.message);
-          setLoading(false);
-          return
-        }
-        setListings(data.data);
-        setLoading(false);
-      } catch (err: any) {
-        setError(err.message);
-      }
-    }
-    fetchListings();
+    fetchListings(urlParams);
   }, [location.search]);
 
   return (
@@ -180,6 +201,11 @@ const Search = () => {
             ))
           }
         </div>
+        {/* ----------- Show More Button ----------- */}
+        {
+          !loading && !error && showMore && 
+          <button onClick={handleShowMoreListing} className="text-green-700 hover:underline underline-offset-4 text-center w-full hover:font-semibold hover:tracking-wide transition-all duration-150">Show more</button>
+        }
       </div>
     </div>
   )
