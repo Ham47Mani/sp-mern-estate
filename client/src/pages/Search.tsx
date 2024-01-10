@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { LISTING } from "../utility/types";
 import { CgSpinnerTwo } from "react-icons/cg";
+import ListingItem from "../components/ListingItem";
 
 // Sidebar Data Search type
 interface SIDEBARDATASEARCH {
@@ -93,8 +94,6 @@ const Search = () => {
     fetchListings();
   }, [location.search]);
 
-  console.log(listings);
-
   return (
     <div className="flex flex-col md:flex-row">
       {/* ----------- Search Filter ----------- */}
@@ -153,7 +152,7 @@ const Search = () => {
           <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95">Search</button>
         </form>
       </div>
-      {/* ----------- Listings ----------- */}
+      {/* ----------- Show Listings Part ----------- */}
       <div className="px-7 py-4 flex-1">
         <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 w-full">Listing results :</h1>
         {/* ------------ Loading ------------ */}
@@ -168,6 +167,19 @@ const Search = () => {
             </div>
           )
         }
+        {/* ----------- Show Listings ----------- */}
+        <div className="flex items-center gap-6 my-7 flex-wrap">
+          {
+            !loading && listings.length == 0 && (
+              <p className='text-xl text-slate-700 font-semibold my-3'>No listing found!!</p>
+            )
+          }
+          {
+            !loading && listings.map(listing => (
+              <ListingItem key={listing._id} listing={listing}/>
+            ))
+          }
+        </div>
       </div>
     </div>
   )

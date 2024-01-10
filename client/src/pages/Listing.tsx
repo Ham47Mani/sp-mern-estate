@@ -71,6 +71,13 @@ const Listing = () => {
                   </SwiperSlide>
                 ))
               }
+              {
+                listing.imageURLs.length === 0 && 
+                <SwiperSlide key="https://blog.hubspot.com/hubfs/Sales_Blog/real-estate-business-compressor.jpg">
+                  <div className="h-[350px] md:h-[550px]" style={{'background': `url("https://blog.hubspot.com/hubfs/Sales_Blog/real-estate-business-compressor.jpg") center no-repeat`, backgroundSize: 'cover'}}>
+                  </div>
+                </SwiperSlide>
+              }
             </Swiper>
             {/* ---------- Share Icon ---------- */}
             <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
@@ -113,7 +120,7 @@ const Listing = () => {
                 {
                   listing.offer && listing.discountPrice &&
                   <p className="bg-green-700 w-full max-w-[200px] text-white capitalize text-center p-2 rounded-md">
-                    s{+listing.regularPrice - +listing.discountPrice}
+                    s{(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-US')} OFF
                   </p>
                 }
               </div>
@@ -125,7 +132,7 @@ const Listing = () => {
               {/* ---------- Listing Specification ---------- */}
               <ul className="flex items-center flex-wrap gap-4 md:gap-6 text-green-900 font-semibold text-sm">
                 {/* --- Badrooms --- */}
-                <li className="flex gap-1 md:gap-2 items-center whitespace-nowrap">
+                <li className="flex gap-2 md:gap-2 items-center whitespace-nowrap">
                   <FaBed className="text-2xl"/>
                   {listing.badRooms > 1 ? `${listing.badRooms} Beds` : `${listing.badRooms} Bed`}
                 </li>
