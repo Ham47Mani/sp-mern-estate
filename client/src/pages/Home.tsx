@@ -34,9 +34,7 @@ const Home = () => {
     fetchListings("type=sell", setSellListings);
     fetchListings("type=rent", setRentListings);
   }, [fetchListings]);
-  console.log("Offer : ", offerListings);
-  console.log("Rent : ", rentListings);
-  console.log("Sell : ", sellListings);
+  
   return (
     <>
       {/* -------------- Top Section Heading -------------- */}

@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, Response } from "express";
 import dotenv from "dotenv";
 import { connectToDB } from "./utils/mongooseCruds";
 import { errorHandler, notFound } from "./middlewares/errorHandling";
@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.route";
 import cors, { CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
 import listingRouter from "./routes/listing.route";
+import path from "path";
 
 
 // Use dotenv package to use envirenment variable
@@ -26,13 +27,19 @@ const corsOptions: CorsOptions = {
 app.use(cors(corsOptions));
 
 // Database URL
-const databaseURL:string = `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`;
+const databaseURL:string = process.env.DATABASE_URL || "";
 connectToDB(databaseURL);// Connect to "SpaiderEstate" Database
 
 // Routes
 app.use("/api/users", userRouter);// User Routes
 app.use("/api/auth", authRouter);// Auth Routes
 app.use("/api/listings", listingRouter);// Listing Routes
+
+__dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '/client/dist')));
+app.get("*", (_, res: Response) => {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
 
 // Error Middleware
 app.use(notFound);
