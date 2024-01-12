@@ -45,7 +45,7 @@ const Home = () => {
             Find your next <span className="text-slate-500">perfect</span><br />
             place with ease
           </h1>
-          <div className="text-gray-400 text-xs sm:text-sm">
+          <div className="text-gray-500 text-xs sm:text-sm">
             Spaider Tech will help you find your home fast, easy and comfortable.<br />
             Our expert support are always available.
           </div>
