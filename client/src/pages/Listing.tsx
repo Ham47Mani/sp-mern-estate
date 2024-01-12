@@ -7,9 +7,9 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation} from "swiper/modules";
 import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import ContactLandlord from "../components/ContactLandlord";
 // Import Swiper styles
 import "swiper/css/bundle";
-import ContactLandlord from "../components/ContactLandlord";
 
 const Listing = () => {
   const {listingID} = useParams();// Get Listing ID from url

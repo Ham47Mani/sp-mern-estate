@@ -10,7 +10,7 @@ type listingItemProps = {
 
 const ListingItem = ({listing}: listingItemProps) => {
   return (
-    <Link to={`/listing/${listing._id}`} className='flex flex-col gap-4 w-full md:w-80 md:h-[500px] bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300'>
+    <Link to={`/listing/${listing._id}`} className='flex flex-col gap-4 w-full md:w-64 md:h-[500px] bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300'>
       {/* -------- Listing Image Cover -------- */}
       <img src={listing.imageURLs[0] || "https://blog.hubspot.com/hubfs/Sales_Blog/real-estate-business-compressor.jpg"} alt={listing.name} className='h-80 md:h-56 w-full object-cover hover:scale-110 transition-scale duration-300' />
       {/* -------- Listing Information -------- */}
