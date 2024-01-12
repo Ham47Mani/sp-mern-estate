@@ -118,7 +118,7 @@ const Search = () => {
   return (
     <div className="flex flex-col md:flex-row">
       {/* ----------- Search Filter ----------- */}
-      <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-slate-300 min-h-screen">
+      <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-slate-300 md:min-h-screen">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {/* ------ Search Term ------ */}
           <div className="flex items-center gap-4">
