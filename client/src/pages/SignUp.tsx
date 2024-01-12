@@ -58,7 +58,7 @@ const SignUp = () => {
     }
   }
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto min-h-[calc(100vh-125px)]">
       {/* ------ Title ------ */}
       <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
       {/* ------ Form ------ */}

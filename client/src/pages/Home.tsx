@@ -4,10 +4,10 @@ import { Link } from "react-router-dom"
 import { LISTING } from "../utility/types";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation} from "swiper/modules";
+import ListingItem from "../components/ListingItem";
 
 // Import Swiper styles
 import "swiper/css/bundle";
-import ListingItem from "../components/ListingItem";
 
 const Home = () => {
   const [offerListings, setOfferListings] = useState<LISTING[]>([]);
